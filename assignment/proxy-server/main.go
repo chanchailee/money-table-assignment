@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 
@@ -13,10 +14,12 @@ func sendToCalculatedServer(w http.ResponseWriter, req *http.Request, operation 
 	resp, err := http.Post(url, "application/json", req.Body)
 
 	if err != nil {
+		log.Panicf("%+v", err.Error())
 		http.Error(w, "bad gateway", http.StatusBadGateway)
 		return
 	}
 	if err != nil {
+		log.Panicf("%+v", err.Error())
 		http.Error(w, "bad gateway", http.StatusBadGateway)
 		return
 	}
@@ -24,6 +27,7 @@ func sendToCalculatedServer(w http.ResponseWriter, req *http.Request, operation 
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Panicf("%+v", err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}

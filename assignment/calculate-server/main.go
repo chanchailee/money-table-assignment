@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 
@@ -58,18 +59,21 @@ func sub(num *object.Req) (float64, error) {
 func calculate(w http.ResponseWriter, req *http.Request, operation func(c *object.Req) (float64, error), operationName string) {
 	num, err := unmarshalReq(w, req)
 	if err != nil {
+		log.Panicf("%+v", err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	result, err := operation(num)
 	if err != nil {
+		log.Panicf("%+v", err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	data, err := marshalResp(operationName, result)
 	if err != nil {
+		log.Panicf("%+v", err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
