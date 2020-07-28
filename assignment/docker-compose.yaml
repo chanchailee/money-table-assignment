@@ -1,0 +1,32 @@
+version: "3"
+services:
+  proxy-server:
+    image: golang:1.15-rc-alpine
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/go/src/github.com/chanchailee/money-table/assignment
+    working_dir: /go/src/github.com/chanchailee/money-table/assignment/proxy-server
+    # command: sh -c "go build && ./proxy-server"
+    command: sh -c "go run main.go"
+    environment:
+      DEBUG: "true"
+      ADDRESS: ":8080"
+      CAL_SERVER: "http://calculate-server:8090"
+
+  calculate-server:
+    image: golang:1.15-rc-alpine
+    ports:
+      - "8090:8090"
+    volumes:
+      - .:/go/src/github.com/chanchailee/money-table/assignment
+    working_dir: /go/src/github.com/chanchailee/money-table/assignment/calculate-server
+    # command: sh -c "go build && ./calculate-server"
+    command: sh -c "go run main.go"
+    environment:
+      DEBUG: "true"
+      ADDRESS: ":8090"
+      PROXY_SERVER: "http://proxy-server:8080"
+
+
+
