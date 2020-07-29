@@ -1,63 +1,16 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/chanchailee/money-table/assignment/pkg/helper"
-	"github.com/chanchailee/money-table/assignment/pkg/object"
+	"github.com/chanchailee/money-table/assignment/pkg/model"
+	"github.com/chanchailee/money-table/assignment/pkg/service"
 )
 
-func marshalResp(method string, result float64) ([]byte, error) {
-	return json.Marshal(object.Resp{
-		Method: method,
-		Result: result,
-	})
-}
-
-func unmarshalReq(w http.ResponseWriter, req *http.Request) (*object.Req, error) {
-	var num object.Req
-	b, err := ioutil.ReadAll(req.Body)
-
-	defer req.Body.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(b, &num)
-	if err != nil {
-		return nil, err
-	}
-
-	return &num, nil
-}
-
-func sum(num *object.Req) (float64, error) {
-	return num.A + num.B, nil
-}
-
-func mul(num *object.Req) (float64, error) {
-	return num.A * num.B, nil
-}
-
-func div(num *object.Req) (float64, error) {
-	if num.B == 0 {
-		return 0, errors.New("invalid numbers : can't divide 0 with 0")
-	}
-
-	return num.A / num.B, nil
-}
-
-func sub(num *object.Req) (float64, error) {
-	return num.A - num.B, nil
-}
-
-func calculate(w http.ResponseWriter, req *http.Request, operation func(c *object.Req) (float64, error), operationName string) {
-	num, err := unmarshalReq(w, req)
+func calculate(w http.ResponseWriter, req *http.Request, operation func(c *model.Req) (float64, error), operationName string) {
+	num, err := service.UnmarshalReq(w, req)
 	if err != nil {
 		log.Panicf("%+v", err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
@@ -71,29 +24,30 @@ func calculate(w http.ResponseWriter, req *http.Request, operation func(c *objec
 		return
 	}
 
-	data, err := marshalResp(operationName, result)
+	data, err := service.MarshalResp(operationName, result)
 	if err != nil {
 		log.Panicf("%+v", err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
-	helper.HandleSuccessResp(w, data)
+
+	service.HandleSuccessResp(w, data)
 }
 
 func handleSum(w http.ResponseWriter, req *http.Request) {
-	calculate(w, req, sum, "sum")
+	calculate(w, req, service.Sum, "sum")
 }
 
 func handleMul(w http.ResponseWriter, req *http.Request) {
-	calculate(w, req, mul, "mul")
+	calculate(w, req, service.Mul, "mul")
 }
 
 func handleDiv(w http.ResponseWriter, req *http.Request) {
-	calculate(w, req, div, "div")
+	calculate(w, req, service.Div, "div")
 }
 
 func handleSub(w http.ResponseWriter, req *http.Request) {
-	calculate(w, req, sub, "sub")
+	calculate(w, req, service.Sub, "sub")
 }
 
 func main() {

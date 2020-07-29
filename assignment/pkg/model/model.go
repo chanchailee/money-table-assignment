@@ -1,4 +1,4 @@
-package object
+package model
 
 // Resp :
 type Resp struct {

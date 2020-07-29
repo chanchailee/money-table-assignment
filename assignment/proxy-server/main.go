@@ -1,45 +1,18 @@
 package main
 
 import (
-	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 
-	"github.com/chanchailee/money-table/assignment/pkg/helper"
+	"github.com/chanchailee/money-table/assignment/pkg/service"
 )
-
-func sendToCalculatedServer(w http.ResponseWriter, req *http.Request, operation string) {
-	url := os.Getenv("CAL_SERVER") + "/" + operation
-	resp, err := http.Post(url, "application/json", req.Body)
-
-	if err != nil {
-		log.Panicf("%+v", err.Error())
-		http.Error(w, "bad gateway", http.StatusBadGateway)
-		return
-	}
-	if err != nil {
-		log.Panicf("%+v", err.Error())
-		http.Error(w, "bad gateway", http.StatusBadGateway)
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Panicf("%+v", err.Error())
-		http.Error(w, "internal server error", http.StatusInternalServerError)
-		return
-	}
-	helper.HandleSuccessResp(w, body)
-}
 
 func sum(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	sendToCalculatedServer(w, req, "sum")
+	service.SendToCalculatedServer(w, req, "sum")
 }
 
 func mul(w http.ResponseWriter, req *http.Request) {
@@ -47,7 +20,7 @@ func mul(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	sendToCalculatedServer(w, req, "mul")
+	service.SendToCalculatedServer(w, req, "mul")
 }
 
 func div(w http.ResponseWriter, req *http.Request) {
@@ -55,7 +28,7 @@ func div(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	sendToCalculatedServer(w, req, "div")
+	service.SendToCalculatedServer(w, req, "div")
 }
 
 func sub(w http.ResponseWriter, req *http.Request) {
@@ -64,7 +37,7 @@ func sub(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	sendToCalculatedServer(w, req, "sub")
+	service.SendToCalculatedServer(w, req, "sub")
 }
 
 func main() {
