@@ -28,11 +28,7 @@ func SendToCalculatedServer(w http.ResponseWriter, req *http.Request, operation 
 		http.Error(w, "bad gateway", http.StatusBadGateway)
 		return
 	}
-	if err != nil {
-		log.Panicf("%+v", err.Error())
-		http.Error(w, "bad gateway", http.StatusBadGateway)
-		return
-	}
+
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -85,7 +81,7 @@ func Mul(num *model.Req) (float64, error) {
 // Div :
 func Div(num *model.Req) (float64, error) {
 	if num.B == 0 {
-		return 0, errors.New("invalid numbers : can't divide 0 with 0")
+		return 0, errors.New("invalid numbers : can't divide with 0")
 	}
 
 	return num.A / num.B, nil

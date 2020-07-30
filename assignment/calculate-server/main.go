@@ -19,14 +19,14 @@ func calculate(w http.ResponseWriter, req *http.Request, operation func(c *model
 
 	result, err := operation(num)
 	if err != nil {
-		log.Panicf("%+v", err.Error())
+		log.Printf("error: %+v", err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	data, err := service.MarshalResp(operationName, result)
 	if err != nil {
-		log.Panicf("%+v", err.Error())
+		log.Printf("error: %+v", err.Error())
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
